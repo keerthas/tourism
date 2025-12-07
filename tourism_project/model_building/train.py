@@ -200,11 +200,11 @@ with mlflow.start_run(run_name="GridSearch_Tourism") as run:
     out_dir = Path(BASE) / "best_model_pipeline"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    out_dir = "/content/best_model_pipeline"
-    os.makedirs(out_dir, exist_ok=True)
-    model_path = os.path.join(out_dir, "best_pipeline.joblib")
+    # out_dir = "/content/best_model_pipeline"
+    # os.makedirs(out_dir, exist_ok=True)
+    model_path = out_dir / "best_pipeline.joblib"
     joblib.dump(best_estimator, model_path)
-    mlflow.log_artifact(model_path, artifact_path="model_artifact")
+    mlflow.log_artifact(model_path.as_posix(), artifact_path="model_artifact")
 
     # Save params & metrics JSON
     meta = {
@@ -212,11 +212,19 @@ with mlflow.start_run(run_name="GridSearch_Tourism") as run:
         "train_metrics": train_metrics,
         "test_metrics": test_metrics
     }
-    with open(os.path.join(out_dir, "metadata.json"), "w") as f:
-        json.dump(meta, f, indent=2)
-    mlflow.log_artifact(os.path.join(out_dir, "metadata.json"), artifact_path="model_artifact")
 
-    print("Logged model and metadata to MLflow artifacts.")
+    meta_path = out_dir / "metadata.json"
+with open(meta_path, "w") as f:
+    json.dump(meta, f, indent=2)
+mlflow.log_artifact(meta_path.as_posix(), artifact_path="model_artifact")
+
+print("Logged model and metadata to MLflow artifacts at:", out_dir)
+
+    # with open(os.path.join(out_dir, "metadata.json"), "w") as f:
+    #     json.dump(meta, f, indent=2)
+    # mlflow.log_artifact(os.path.join(out_dir, "metadata.json"), artifact_path="model_artifact")
+
+    # print("Logged model and metadata to MLflow artifacts.")
 
 # ---- After MLflow run: Register/upload the model to Hugging Face model hub ----
 MODEL_REPO_ID = f"{HF_USERNAME}/{MODEL_REPO_NAME}"
