@@ -8,23 +8,21 @@ import os
 if os.getenv("GITHUB_ACTIONS") != "true":
     try:
         from pyngrok import ngrok
+        ngrok_token = os.getenv("Ngrok")
+
+        # Set your auth token here (replace with your actual token)
+        ngrok.set_auth_token(ngrok_token)
+        
+        # Start MLflow UI on port 5000
+        process = subprocess.Popen(["mlflow", "ui", "--port", "5000"])
+        
+        # Create public tunnel
+        public_url = ngrok.connect(5000).public_url
+        print("MLflow UI is available at:", public_url)
     except ImportError:
         ngrok = None
 else:
     ngrok = None
-
-
-ngrok_token = os.getenv("Ngrok")
-
-# Set your auth token here (replace with your actual token)
-ngrok.set_auth_token(ngrok_token)
-
-# Start MLflow UI on port 5000
-process = subprocess.Popen(["mlflow", "ui", "--port", "5000"])
-
-# Create public tunnel
-public_url = ngrok.connect(5000).public_url
-print("MLflow UI is available at:", public_url)
 
 import os
 access_token = os.getenv("Login")
@@ -65,7 +63,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import mlflow, mlflow.sklearn
 
 # ---- MLflow setup ----
-mlflow.set_tracking_uri(public_url)
+# mlflow.set_tracking_uri(public_url)
 mlflow.set_experiment(EXPERIMENT_NAME)
 print("MLflow tracking URI:", mlflow.get_tracking_uri())
 print("MLflow experiment:", EXPERIMENT_NAME)
