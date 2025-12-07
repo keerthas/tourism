@@ -1,34 +1,32 @@
-import os, joblib, pandas as pd
+# app.py
+import os
+import joblib
+import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any
 from huggingface_hub import hf_hub_download
 
-# from google.colab import userdata
-# access_token = userdata.get("Login") 
-
-# access_token = HfApi(token=os.environ["Login"])
-
-# HF_MODEL_REPO = os.environ.get("HF_MODEL_REPO", "<YOUR_HF_USERNAME>/<YOUR_MODEL_REPO>")
-# MODEL_FILENAME = os.environ.get("MODEL_FILENAME", "best_pipeline.joblib")
-# HF_TOKEN = os.environ.get("Login", None)
-
-import os
+# Prefer HF_TOKEN env var; fallback to Login only if present
 HF_TOKEN = os.getenv("Login")
+if not HF_TOKEN:
+    raise RuntimeError("ERROR: HF token not found in environment. Set HF_TOKEN (or HUGGINGFACE_HUB_TOKEN / Login).")
 
-HF_MODEL_REPO = "https://huggingface.co/keerthas/tourism-package-model"
-MODEL_FILENAME = "best_pipeline.joblib"
-# HF_TOKEN = access_token
+# IMPORTANT: hf_hub_download expects repo_id as "username/repo" (NOT a full URL)
+HF_MODEL_REPO = os.getenv("HF_MODEL_REPO", "keerthas/tourism-package-model")  # set via env if needed
+MODEL_FILENAME = os.getenv("MODEL_FILENAME", "best_pipeline.joblib")
 
 app = FastAPI(title="Tourism Package Prediction Service")
 
 def load_model_from_hf():
     try:
-        path = hf_hub_download(repo_id=HF_MODEL_REPO, filename=MODEL_FILENAME, token=HF_TOKEN)
-        model = joblib.load(path)
+        # If the model repo is actually a model repo, repo_type defaults to "model" so no need to pass repo_type.
+        model_path = hf_hub_download(repo_id=HF_MODEL_REPO, filename=MODEL_FILENAME, token=HF_TOKEN)
+        model = joblib.load(model_path)
+        print("Model loaded from:", model_path)
         return model
     except Exception as e:
-        raise RuntimeError(f"Failed to download/load model from HF: {e}")
+        raise RuntimeError(f"Failed to download/load model from HF ({HF_MODEL_REPO}/{MODEL_FILENAME}): {e}")
 
 MODEL = load_model_from_hf()
 
