@@ -1,5 +1,3 @@
-# 1) Install library
-!pip install -q huggingface_hub
 
 # 2) Set variables - EDIT these!
 HF_USERNAME = "keerthas"   # e.g. "sarassu"
