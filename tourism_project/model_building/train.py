@@ -193,6 +193,13 @@ with mlflow.start_run(run_name="GridSearch_Tourism") as run:
     print("Test metrics:", test_metrics)
 
     # Save model locally with joblib and log as artifact
+    import os
+    from pathlib import Path
+    
+    BASE = os.getenv("OUTPUT_BASE")
+    out_dir = Path(BASE) / "best_model_pipeline"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
     out_dir = "/content/best_model_pipeline"
     os.makedirs(out_dir, exist_ok=True)
     model_path = os.path.join(out_dir, "best_pipeline.joblib")
