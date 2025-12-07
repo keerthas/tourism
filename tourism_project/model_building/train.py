@@ -1,8 +1,17 @@
 
-from pyngrok import ngrok
 import subprocess
 import mlflow
 import os
+
+import os
+
+if os.getenv("GITHUB_ACTIONS") != "true":
+    try:
+        from pyngrok import ngrok
+    except ImportError:
+        ngrok = None
+else:
+    ngrok = None
 
 
 ngrok_token = os.getenv("Ngrok")
