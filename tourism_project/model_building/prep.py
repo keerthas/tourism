@@ -129,9 +129,20 @@ else:
 
 print("Xtrain:", Xtrain.shape, "Xtest:", Xtest.shape, "ytrain:", ytrain.shape, "ytest:", ytest.shape)
 
+# # ---- Step 8: Save train/test CSVs locally ----
+# out_dir = "/content/processed"
+# os.makedirs(out_dir, exist_ok=True)
+
 # ---- Step 8: Save train/test CSVs locally ----
-out_dir = "/content/processed"
-os.makedirs(out_dir, exist_ok=True)
+import os
+from pathlib import Path
+
+BASE = os.getenv("OUTPUT_BASE")
+out_dir = Path(BASE) / "processed"
+out_dir.mkdir(parents=True, exist_ok=True)
+
+print(f"Writing outputs to: {out_dir}")
+
 Xtrain_path = os.path.join(out_dir, "Xtrain.csv")
 Xtest_path  = os.path.join(out_dir, "Xtest.csv")
 ytrain_path = os.path.join(out_dir, "ytrain.csv")
