@@ -1,4 +1,22 @@
 
+from pyngrok import ngrok
+import subprocess
+import mlflow
+import os
+
+
+ngrok_token = os.getenv("Ngrok")
+
+# Set your auth token here (replace with your actual token)
+ngrok.set_auth_token(ngrok_token)
+
+# Start MLflow UI on port 5000
+process = subprocess.Popen(["mlflow", "ui", "--port", "5000"])
+
+# Create public tunnel
+public_url = ngrok.connect(5000).public_url
+print("MLflow UI is available at:", public_url)
+
 import os
 access_token = os.getenv("Login")
 
